@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ENGL 101 Paragraph Grader</title>
+  <meta name="description" content="Upload a photo of a student's paragraph and get a rubric-based grade with reasons.">
+  <link rel="icon" href="assets/logo.jpg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo-card"><img src="assets/logo.jpg" alt="Imam Abdulrahman Bin Faisal University logo"></div>
+    <div class="header-text">
+      <p class="eyebrow">Deanship of Preparatory Year and Supporting Studies &middot; Department of English Language</p>
+      <h1>ENGL 101 Paragraph Grader</h1>
+      <p class="sub">Writing Portfolio &middot; Paragraph Writing Rubric</p>
+    </div>
+  </div>
+  <div class="stripe-band" aria-hidden="true"></div>
+</header>
+
+<main>
+
+  <!-- 1. SETTINGS -->
+  <section class="card no-print" id="settings-card">
+    <h2><span class="step">1</span> Setup</h2>
+    <div class="grid two">
+      <label>Anthropic API key
+        <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off">
+        <small>Saved only in this browser (localStorage). Never sent anywhere except Anthropic.</small>
+      </label>
+      <label>Model
+        <input type="text" id="model" list="models" value="claude-sonnet-5-5">
+        <datalist id="models">
+          <option value="claude-sonnet-5-5">
+          <option value="claude-opus-5-5">
+          <option value="claude-fable-5-1">
+        </datalist>
+        <small>Any vision-capable Claude model ID.</small>
+      </label>
+    </div>
+  </section>
+
+  <!-- 2. INPUT -->
+  <section class="card no-print" id="input-card">
+    <h2><span class="step">2</span> Student writing</h2>
+    <div class="grid three">
+      <label>Student name <span class="opt">(optional)</span>
+        <input type="text" id="studentName" placeholder="e.g. Ahmed Ali">
+      </label>
+      <label>Student ID <span class="opt">(optional)</span>
+        <input type="text" id="studentId" placeholder="e.g. 2260000037">
+      </label>
+      <label>Writing portfolio
+        <select id="wpNumber">
+          <option>WP1</option>
+          <option>WP2</option>
+        </select>
+      </label>
+    </div>
+    <label>Assigned topic / required subtopics / unit vocabulary <span class="opt">(optional but recommended)</span>
+      <textarea id="topic" rows="3" placeholder="e.g. Topic: A healthy lifestyle. Subtopics: diet, exercise, sleep. Unit vocabulary: nutritious, workout, routine..."></textarea>
+    </label>
+
+    <div id="dropzone" tabindex="0">
+      <input type="file" id="fileInput" accept="image/*" multiple hidden>
+      <p class="dz-title">Drop photo(s) of the writing here</p>
+      <p class="dz-sub">or click to choose / take a photo &middot; several photos allowed for a multi-page paragraph</p>
+    </div>
+    <div id="thumbs"></div>
+
+    <div class="actions">
+      <button id="gradeBtn" class="btn primary" disabled>Grade this writing</button>
+      <button id="clearBtn" class="btn ghost" type="button">Clear</button>
+    </div>
+    <p id="status" role="status"></p>
+  </section>
+
+  <!-- 3. RESULT -->
+  <section class="card" id="result-card" hidden>
+    <div class="result-head">
+      <h2><span class="step">3</span> Grade report</h2>
+      <button id="printBtn" class="btn primary no-print" type="button">Print report</button>
+    </div>
+    <div id="report"></div>
+  </section>
+
+  <!-- RUBRIC REFERENCE -->
+  <section class="card no-print">
+    <h2>How the grade is calculated</h2>
+    <p>Five criteria are each scored out of <strong>10</strong> using the ENGL 101 Paragraph Writing Rubric (total out of <strong>50</strong>). The mark that goes into the gradebook uses the same formula as the <em>WP1</em> sheet:</p>
+    <p class="formula"><code>=SUM(D12:H12)/50*7.5</code> &rarr; Total WP1 (out of 7.5)</p>
+    <div class="table-wrap">
+      <table class="rubric-table">
+        <thead><tr><th>Band</th><th>Content</th><th>Organization</th><th>Grammar</th><th>Vocabulary</th><th>Mechanics &amp; Spelling</th></tr></thead>
+        <tbody>
+          <tr><th>8&ndash;10</th><td>Fully on topic; topic sentence linked to 3 subtopics (2 sentences each); conclusion refers back</td><td>Topic sentence first; discernible order; concluding sentence last</td><td>Minimal S-V errors; errors don't hinder comprehension</td><td>Correct usage; level-appropriate; unit vocabulary used</td><td>&le; 6 errors</td></tr>
+          <tr><th>6&ndash;7</th><td>Slightly off topic and/or &lt; 6 sentences; topic sentence doesn't control paragraph</td><td>Elements present but no clear pattern / some missing</td><td>Comprehensible; S-V errors rare; occasional tense errors</td><td>Some appropriate vocabulary; some misused words</td><td>7&ndash;8 errors</td></tr>
+          <tr><th>4&ndash;5</th><td>Off topic and/or &lt; 4 sentences; subtopics irrelevant/absent</td><td>Some elements, lacking organization</td><td>Hard to understand; S-V and structure errors common</td><td>Noticeably incorrect; below level</td><td>9&ndash;12 errors</td></tr>
+          <tr><th>0&ndash;3</th><td>Off topic but shows effort; 2&ndash;4 sentences</td><td>No organization</td><td>Cannot form correct sentences</td><td>Many words incorrect; excessively elementary</td><td>13&ndash;16+ errors</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="rules">
+      <li>Off-topic but shows effort: total must be between <strong>3 and 10</strong> marks (out of 50).</li>
+      <li>Fewer than 2 sentences: <strong>0</strong> for the entire production.</li>
+      <li>Plagiarized or memorized off-topic production: <strong>ZERO</strong>. The AI can only flag this &mdash; you confirm it with the checkbox in the report.</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="stripe-band thin" aria-hidden="true"></div>
+  <div class="footer-inner">
+    <img src="assets/logo.jpg" alt="" class="footer-logo">
+    <div>
+      <p class="credits-label">Created by</p>
+      <p class="credits">Prof. Ahmad Motie Hamaidi <span>&amp;</span> Ashraf Ahmad Motie Hamaidi</p>
+      <p class="small">Imam Abdulrahman Bin Faisal University &middot; Department of English Language</p>
+    </div>
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>
